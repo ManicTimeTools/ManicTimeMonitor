@@ -5,34 +5,35 @@ using System.Data.SqlServerCe;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Text;
 using System.Xml.Linq;
 
 namespace ManicTimeMonitor
 {
-	class Updater
+	internal class Updater
 	{
-		private IDictionary<string, String> Queries = new Dictionary<string, String>();
-		private IDictionary<string, int> LastRecord = new Dictionary<string, int>();
-		private String DatabaseLocation;
-		private String UpdateUrl;
-
 		public delegate void NotificationEventHandler(String message);
 
-		public event NotificationEventHandler ProgressMessage;
+		private readonly String _databaseLocation;
+		private readonly IDictionary<string, int> _lastRecord = new Dictionary<string, int>();
+		private readonly IDictionary<string, String> _queries = new Dictionary<string, String>();
+		private readonly String _updateUrl;
 
 		public Updater(string updateUrl, string databaseLocation)
 		{
-			Queries["Activity"] = "ActivityId, TimelineId, DisplayName, GroupId, StartLocalTime, EndLocalTime";
-			Queries["Group"] = "GroupId, TimelineId, DisplayName, Icon32, FolderId, TextData";
-			Queries["Timeline"] = "TimelineId, TypeName, SourceTypeName";
+			_queries["Activity"] = "ActivityId, TimelineId, DisplayName, GroupId, StartLocalTime, EndLocalTime";
+			_queries["Group"] = "GroupId, TimelineId, DisplayName, Icon32, FolderId, TextData";
+			_queries["Timeline"] = "TimelineId, TypeName, SourceTypeName";
 
-			LastRecord["Activity"] = 0;
-			LastRecord["Group"] = 0;
-			LastRecord["Timeline"] = 0;
+			_lastRecord["Activity"] = 0;
+			_lastRecord["Group"] = 0;
+			_lastRecord["Timeline"] = 0;
 
-			DatabaseLocation = databaseLocation;
-			UpdateUrl = updateUrl;
+			_databaseLocation = databaseLocation;
+			_updateUrl = updateUrl;
 		}
+
+		public event NotificationEventHandler ProgressMessage;
 
 		public void Update()
 		{
@@ -40,38 +41,38 @@ namespace ManicTimeMonitor
 			OnProgressMessage("Let's do this");
 
 			// See if we can open the database before wasting precioous bandwidth
-			SqlCeConnection conn = new SqlCeConnection("Data Source = " + DatabaseLocation);
+			SqlCeConnection conn = new SqlCeConnection("Data Source = " + _databaseLocation);
 			conn.Open();
 
-			String refresh = httpRequest(UpdateUrl + "&refresh");
+			String refresh = httpRequest(_updateUrl + "&refresh");
 			if (refresh.Trim() != "")
 			{
 				XDocument doc = XDocument.Parse(refresh);
 				foreach (var table in doc.Descendants())
 				{
 					if (table.Name.ToString() == "root") continue;
-					OnProgressMessage("Got last record for " + table.Name.ToString() + ": " + table.Value);
-					LastRecord[table.Name.ToString()] = Convert.ToInt32(table.Value);
+					OnProgressMessage("Got last record for " + table.Name + ": " + table.Value);
+					_lastRecord[table.Name.ToString()] = Convert.ToInt32(table.Value);
 				}
 			}
 
-			foreach (string table in new List<string>(Queries.Keys))
+			foreach (string table in new List<string>(_queries.Keys))
 			{
 				OnProgressMessage("Processing " + table);
-				DataSet ds = null;
+				DataSet ds;
 				do
 				{
-					SqlCeCommand cmd = new SqlCeCommand("select " + Queries[table] + " from [" + table + "] where [" + table + "Id] > " + LastRecord[table] + " order by [" + table + "Id] ASC", conn);
+					SqlCeCommand cmd = new SqlCeCommand("select " + _queries[table] + " from [" + table + "] where [" + table + "Id] > " + _lastRecord[table] + " order by [" + table + "Id] ASC", conn);
 					ds = new DataSet(table);
 					new SqlCeDataAdapter(cmd).Fill(ds, 0, 1500, "Row");
 
 					if (ds.Tables[0].Rows.Count > 0)
 					{
-						String response = httpRequest(UpdateUrl, ds.GetXml());
+						String response = httpRequest(_updateUrl, ds.GetXml());
 						if (response == ds.Tables[0].Rows[ds.Tables[0].Rows.Count - 1][table + "id"].ToString())
 						{
-							LastRecord[table] = Convert.ToInt32(response);
-							OnProgressMessage("Pushed up to ID " + LastRecord[table] + "  (" + ds.Tables[0].Rows.Count + " Rows)");
+							_lastRecord[table] = Convert.ToInt32(response);
+							OnProgressMessage("Pushed up to ID " + _lastRecord[table] + "  (" + ds.Tables[0].Rows.Count + " Rows)");
 						}
 						else
 						{
@@ -90,13 +91,13 @@ namespace ManicTimeMonitor
 		}
 
 
-		private string httpRequest(String url, String POST = null)
+		private string httpRequest(String url, String post = null)
 		{
 			WebRequest httpWebRequest = WebRequest.Create(url);
 
-			if (POST != null)
+			if (post != null)
 			{
-				byte[] bytes = System.Text.Encoding.ASCII.GetBytes(POST);
+				byte[] bytes = Encoding.UTF8.GetBytes(post);
 				httpWebRequest.Method = "POST";
 				using (Stream request = httpWebRequest.GetRequestStream())
 				{
@@ -111,7 +112,9 @@ namespace ManicTimeMonitor
 				}
 			}
 
-			using (StreamReader streamReader = new StreamReader(httpWebRequest.GetResponse().GetResponseStream()))
+			Stream response = httpWebRequest.GetResponse().GetResponseStream();
+
+			using (StreamReader streamReader = new StreamReader(response))
 			{
 				return streamReader.ReadToEnd();
 			}

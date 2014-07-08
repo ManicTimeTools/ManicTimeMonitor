@@ -3,94 +3,54 @@ using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using Microsoft.Win32.TaskScheduler;
+using Action = System.Action;
 
 namespace ManicTimeMonitor
 {
 	public partial class Form1 : Form
 	{
-		private Thread worker;
-		public String UpdateUrl;
-		public String DatabaseLocation;
+		private Settings _settings = new Settings();
+		private Thread _worker;
 
 		public Form1()
 		{
 			InitializeComponent();
 		}
 
-		void Updater_ProgressMessage(string message)
+		private void Updater_ProgressMessage(string message)
 		{
 			UpdateBtn.Invoke(new Action(() => LogTxt.AppendText("[" + DateTime.Now + "] " + message + "\r\n")));
 		}
 
-		protected void LoadDatabaseLocation()
-		{
-			if (Properties.Settings.Default.DatabaseLocation == "")
-			{
-				DatabaseLocation = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Finkit\\ManicTime\\ManicTime.sdf";
-			}
-			else
-			{
-				DatabaseLocation = Properties.Settings.Default.DatabaseLocation;
-			}
-		}
-
 		protected void UpdateDatabaseLocation(String databaseLocation)
 		{
-			if (DatabaseLocation == databaseLocation)
-			{
-				return;
-			}
-
-			DatabaseLocation = databaseLocation;
-			Properties.Settings.Default.DatabaseLocation = DatabaseLocation;
-			Properties.Settings.Default.Save();
-		}
-
-		protected void LoadUpdateUrl()
-		{
-			if (Properties.Settings.Default.UpdateUrl == "")
-			{
-				UpdateUrl = "https://alexou.net/manictime/?pc=" + Environment.MachineName;
-			}
-			else
-			{
-				UpdateUrl = Properties.Settings.Default.UpdateUrl;
-			}
-
+			_settings.DatabaseLocation = databaseLocation;
 		}
 
 		protected void UpdateUpdateUrl(String updateUrl)
 		{
-			if (UpdateUrl == updateUrl)
-			{
-				return;
-			}
-
-			UpdateUrl = updateUrl;
-			Properties.Settings.Default.UpdateUrl = UpdateUrl;
-			Properties.Settings.Default.Save();
+			_settings.UpdateUrl = updateUrl;
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
-			LoadUpdateUrl();
-			LoadDatabaseLocation();
-			UpdateUrlTxt.Text = UpdateUrl;
-			DatabaseLocationTxt.Text = DatabaseLocation;
+			UpdateUrlTxt.Text = _settings.UpdateUrl;
+			DatabaseLocationTxt.Text = _settings.DatabaseLocation;
 		}
 
 		private void UpdateBtn_Click(object sender, EventArgs e)
 		{
-			if (worker == null)
+			if (_worker == null)
 			{
 				UpdateBtn.Text = "Stop";
 				LogTxt.Text = "";
-				worker = new Thread(() =>
+				_worker = new Thread(() =>
 				{
 					try
 					{
-						Updater updater = new Updater(UpdateUrl, DatabaseLocation);
-						updater.ProgressMessage += new ManicTimeMonitor.Updater.NotificationEventHandler(Updater_ProgressMessage);
+						Updater updater = new Updater(_settings.UpdateUrl, _settings.DatabaseLocation);
+						updater.ProgressMessage += Updater_ProgressMessage;
 						updater.Update();
 					}
 					catch (ThreadAbortException)
@@ -102,14 +62,14 @@ namespace ManicTimeMonitor
 						MessageBox.Show(ex.StackTrace, ex.Message);
 					}
 					UpdateBtn.Invoke(new Action(() => UpdateBtn.Text = "Update now"));
-					worker = null;
+					_worker = null;
 				});
-				worker.Start();
+				_worker.Start();
 			}
 			else
 			{
-				worker.Abort();
-				worker = null;
+				_worker.Abort();
+				_worker = null;
 				UpdateBtn.Text = "Update now";
 				LogTxt.AppendText("Stopped");
 			}
@@ -137,17 +97,22 @@ namespace ManicTimeMonitor
 
 		private void DatabaseLocationBtn_Click(object sender, EventArgs e)
 		{
-			openFileDialog.FileName = Path.GetFileName(DatabaseLocation);
-			openFileDialog.InitialDirectory = Path.GetDirectoryName(DatabaseLocation);
+			openFileDialog.FileName = Path.GetFileName(_settings.DatabaseLocation);
+			openFileDialog.InitialDirectory = Path.GetDirectoryName(_settings.DatabaseLocation);
 			openFileDialog.ShowDialog();
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (worker != null)
+			if (_worker != null)
 			{
-				worker.Abort();
+				_worker.Abort();
 			}
+		}
+
+		private void ConfigureTaskScheduleBtn_Click(object sender, EventArgs e)
+		{
+			ScheduledTask.Register();
 		}
 	}
 }

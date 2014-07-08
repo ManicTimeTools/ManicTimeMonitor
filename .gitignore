@@ -2,3 +2,5 @@
 /ManicTimeMonitor/bin
 /ManicTimeMonitor.suo
 /ManicTimeMonitor/*.user
+/packages
+/*.user

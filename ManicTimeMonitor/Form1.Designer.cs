@@ -37,6 +37,7 @@
 			this.LogTxt = new System.Windows.Forms.TextBox();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.DatabaseLocationBtn = new System.Windows.Forms.Button();
+			this.ConfigureTaskScheduleBtn = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// UpdateBtn
@@ -130,11 +131,22 @@
 			this.DatabaseLocationBtn.UseVisualStyleBackColor = true;
 			this.DatabaseLocationBtn.Click += new System.EventHandler(this.DatabaseLocationBtn_Click);
 			// 
+			// ConfigureTaskScheduleBtn
+			// 
+			this.ConfigureTaskScheduleBtn.Location = new System.Drawing.Point(160, 426);
+			this.ConfigureTaskScheduleBtn.Name = "ConfigureTaskScheduleBtn";
+			this.ConfigureTaskScheduleBtn.Size = new System.Drawing.Size(138, 28);
+			this.ConfigureTaskScheduleBtn.TabIndex = 8;
+			this.ConfigureTaskScheduleBtn.Text = "Configure Task Schedule";
+			this.ConfigureTaskScheduleBtn.UseVisualStyleBackColor = true;
+			this.ConfigureTaskScheduleBtn.Click += new System.EventHandler(this.ConfigureTaskScheduleBtn_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(392, 466);
+			this.Controls.Add(this.ConfigureTaskScheduleBtn);
 			this.Controls.Add(this.DatabaseLocationBtn);
 			this.Controls.Add(this.LogTxt);
 			this.Controls.Add(this.label2);
@@ -165,6 +177,7 @@
         private System.Windows.Forms.TextBox LogTxt;
 		private System.Windows.Forms.OpenFileDialog openFileDialog;
 		private System.Windows.Forms.Button DatabaseLocationBtn;
+		private System.Windows.Forms.Button ConfigureTaskScheduleBtn;
 
     }
 }
