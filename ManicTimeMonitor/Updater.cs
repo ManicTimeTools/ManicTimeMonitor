@@ -41,7 +41,7 @@ namespace ManicTimeMonitor
 			OnProgressMessage("Let's do this");
 
 			// See if we can open the database before wasting precioous bandwidth
-			SqlCeConnection conn = new SqlCeConnection("Data Source = " + _databaseLocation);
+			SqlCeConnection conn = new SqlCeConnection("Data Source = " + _databaseLocation + ";Max Database Size=4000;");
 			conn.Open();
 
 			String refresh = httpRequest(_updateUrl + "&refresh");
@@ -69,10 +69,19 @@ namespace ManicTimeMonitor
 					if (ds.Tables[0].Rows.Count > 0)
 					{
 						String response = httpRequest(_updateUrl, ds.GetXml());
-						if (response == ds.Tables[0].Rows[ds.Tables[0].Rows.Count - 1][table + "id"].ToString())
+						DataRow lastRow = ds.Tables[0].Rows[ds.Tables[0].Rows.Count - 1];
+						if (response == lastRow[table + "Id"].ToString())
 						{
 							_lastRecord[table] = Convert.ToInt32(response);
-							OnProgressMessage("Pushed up to ID " + _lastRecord[table] + "  (" + ds.Tables[0].Rows.Count + " Rows)");
+							if (table == "Activity")
+							{
+								OnProgressMessage("Pushed up to ID " + _lastRecord[table] + " (" + lastRow["EndLocalTime"] + ") (" + ds.Tables[0].Rows.Count + " Rows)");
+							}
+							else
+							{
+								OnProgressMessage("Pushed up to ID " + _lastRecord[table] + " (" + ds.Tables[0].Rows.Count + " Rows)");
+							}
+							
 						}
 						else
 						{

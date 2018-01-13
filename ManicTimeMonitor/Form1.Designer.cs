@@ -43,7 +43,7 @@
 			// UpdateBtn
 			// 
 			this.UpdateBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.UpdateBtn.Location = new System.Drawing.Point(11, 426);
+			this.UpdateBtn.Location = new System.Drawing.Point(11, 422);
 			this.UpdateBtn.Name = "UpdateBtn";
 			this.UpdateBtn.Size = new System.Drawing.Size(78, 28);
 			this.UpdateBtn.TabIndex = 0;
@@ -54,7 +54,7 @@
 			// QuitBtn
 			// 
 			this.QuitBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.QuitBtn.Location = new System.Drawing.Point(304, 426);
+			this.QuitBtn.Location = new System.Drawing.Point(396, 422);
 			this.QuitBtn.Name = "QuitBtn";
 			this.QuitBtn.Size = new System.Drawing.Size(76, 28);
 			this.QuitBtn.TabIndex = 1;
@@ -68,7 +68,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.UpdateUrlTxt.Location = new System.Drawing.Point(12, 36);
 			this.UpdateUrlTxt.Name = "UpdateUrlTxt";
-			this.UpdateUrlTxt.Size = new System.Drawing.Size(368, 20);
+			this.UpdateUrlTxt.Size = new System.Drawing.Size(460, 20);
 			this.UpdateUrlTxt.TabIndex = 2;
 			this.UpdateUrlTxt.Leave += new System.EventHandler(this.UpdateUrlTxt_Leave);
 			// 
@@ -99,7 +99,7 @@
 			this.DatabaseLocationTxt.Location = new System.Drawing.Point(12, 88);
 			this.DatabaseLocationTxt.Name = "DatabaseLocationTxt";
 			this.DatabaseLocationTxt.ReadOnly = true;
-			this.DatabaseLocationTxt.Size = new System.Drawing.Size(331, 20);
+			this.DatabaseLocationTxt.Size = new System.Drawing.Size(423, 20);
 			this.DatabaseLocationTxt.TabIndex = 4;
 			this.DatabaseLocationTxt.TextChanged += new System.EventHandler(this.DatabaseLocationTxt_TextChanged);
 			// 
@@ -112,7 +112,7 @@
 			this.LogTxt.Multiline = true;
 			this.LogTxt.Name = "LogTxt";
 			this.LogTxt.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.LogTxt.Size = new System.Drawing.Size(369, 306);
+			this.LogTxt.Size = new System.Drawing.Size(461, 302);
 			this.LogTxt.TabIndex = 6;
 			// 
 			// openFileDialog
@@ -123,7 +123,7 @@
 			// DatabaseLocationBtn
 			// 
 			this.DatabaseLocationBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.DatabaseLocationBtn.Location = new System.Drawing.Point(350, 88);
+			this.DatabaseLocationBtn.Location = new System.Drawing.Point(442, 88);
 			this.DatabaseLocationBtn.Name = "DatabaseLocationBtn";
 			this.DatabaseLocationBtn.Size = new System.Drawing.Size(30, 20);
 			this.DatabaseLocationBtn.TabIndex = 7;
@@ -133,7 +133,8 @@
 			// 
 			// ConfigureTaskScheduleBtn
 			// 
-			this.ConfigureTaskScheduleBtn.Location = new System.Drawing.Point(160, 426);
+			this.ConfigureTaskScheduleBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.ConfigureTaskScheduleBtn.Location = new System.Drawing.Point(252, 422);
 			this.ConfigureTaskScheduleBtn.Name = "ConfigureTaskScheduleBtn";
 			this.ConfigureTaskScheduleBtn.Size = new System.Drawing.Size(138, 28);
 			this.ConfigureTaskScheduleBtn.TabIndex = 8;
@@ -145,7 +146,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(392, 466);
+			this.ClientSize = new System.Drawing.Size(484, 462);
 			this.Controls.Add(this.ConfigureTaskScheduleBtn);
 			this.Controls.Add(this.DatabaseLocationBtn);
 			this.Controls.Add(this.LogTxt);
